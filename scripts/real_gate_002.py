@@ -23,6 +23,7 @@ import numpy as np
 from mne.io import read_raw_edf
 from resonator3.cli import analyze
 from resonator3.conditional import bandpass_sources,conditional_predictors
+from resonator3.core import candidate_lags,_fit_and_score,_design,_scores
 from scripts.real_nemar_excerpt import urls,fetch_excerpt,channels_from_sidecar
 
 TIMES=(0,120,240)
@@ -115,6 +116,7 @@ def run():
     root=Path("results/real_gate_002")
     root.mkdir(parents=True,exist_ok=True)
     entries=[]
+    frozen=None
     for start in TIMES:
         with tempfile.TemporaryDirectory(prefix="har3_excerpt_") as temp:
             path=Path(temp)/"partial.edf"
@@ -143,6 +145,26 @@ def run():
                     })
         xfiltered,yfiltered=bandpass_sources(src,car,fs,low=50,high=500)
         conditional=conditional_predictors(xfiltered,yfiltered,fs)
+        # Distinguish a response that can be independently re-fit in each
+        # 35-second window from a stable, transportable physical operator.
+        # Freeze the FIR coefficients from the FIRST window's training
+        # interval BEFORE analyzing windows 120 and 240 seconds.
+        lag_grid=candidate_lags(fs,negative_ms=20,positive_ms=120,step_ms=1)
+        if start==TIMES[0]:
+            coef,intercept,_,_,_=_fit_and_score(
+                xfiltered["mic1"],yfiltered,lag_grid,
+                ridge=.03,max_taps=9,
+                spacing_samples=max(1,round(fs*.004)))
+            frozen=(coef,intercept,lag_grid)
+            frozen_score=None
+        else:
+            C,b,lag_grid=frozen
+            design,time_idx=_design(xfiltered["mic1"],lag_grid)
+            # Full later segment is an outer holdout relative to first-
+            # window training. No re-centering or re-fitting of weights.
+            frozen_score=_scores(yfiltered[:,time_idx].T,
+                                 design@C+b)
+
         rows={v["channel"]:v for v in aud["rows"]}
         positive=[k for k in ELECTRODES if rows[k]["above_shifted_audio_controls"]]
         entries.append({
@@ -156,6 +178,9 @@ def run():
                 v["heldout_r2"] for v in rows.values()])),
             "car_positive_audio_channels":positive,
             "car_positive_audio_count":len(positive),
+            "frozen_first_window_train_to_this_window_r2":(
+                dict(zip(ELECTRODES,frozen_score.tolist()))
+                if frozen_score is not None else None),
             "source_group_comparison":_group_summary(conditional,ELECTRODES),
             "mic_increment_over_lip":dict(zip(
                 ELECTRODES,conditional["mic_increment_over_lip"]))
@@ -188,6 +213,10 @@ def run():
         comparisons[c]=[
             {"start_seconds":r["start_seconds"],
              "car_audio_heldout_r2":r["car_audio_score"][c]["heldout_r2"],
+             "first_window_frozen_fir_r2":(
+                 r["frozen_first_window_train_to_this_window_r2"][c]
+                 if r["frozen_first_window_train_to_this_window_r2"] is not None
+                 else None),
              "audio_minus_best_wrong_r2":r["car_audio_score"][c]["heldout_r2"]-
                                          r["car_audio_score"][c]["wrong_audio_best_r2"],
              "mic_only_fixedlag_r2":r["source_group_comparison"]["mic1"]["per_channel_test_r2"][c],
@@ -213,6 +242,8 @@ def run():
                     "audio_to_car_mean_heldout_r2":r["audio_to_car_mean_heldout_r2"],
                     "car_positive_audio_channels":r["car_positive_audio_channels"],
                     "car_positive_audio_count":r["car_positive_audio_count"],
+                    "frozen_first_window_train_to_this_window_r2":
+                        r["frozen_first_window_train_to_this_window_r2"],
                     "source_group_comparison":r["source_group_comparison"],
                     "mic_increment_over_lip":r["mic_increment_over_lip"],
                     "lip_increment_over_mic":r["lip_increment_over_mic"],
@@ -227,6 +258,7 @@ def run():
             "Three windows from ONE previously selected participant/run; not cross-subject replication.",
             "Original 0..35s window selected due to strong earlier signal; other windows were frozen in code before running.",
             "The three survivor IDs were postselected from the initial window; they are not independent discovery targets.",
+            "A fixed sparse FIR is fitted only on the first 60% of window 0 and evaluated without refitting on complete later windows; scores may be negative if the response changes.",
             "Lip EMG and speech microphone share common vocal causes; gains do not prove EMG contamination or a neural source.",
             "The microphone channel is a recorded monitor, not an exogenous instrument.",
             "CAR can remove widespread real electrophysiology as well as pickup.",
@@ -240,7 +272,10 @@ def run():
         print("SURVIVOR",ch,[(r["start_seconds"],
                   round(r["car_audio_heldout_r2"],4),
                   round(r["lip_only_fixedlag_r2"],4),
-                  round(r["both_fixedlag_r2"],4)) for r in records],flush=True)
+                  round(r["both_fixedlag_r2"],4),
+                  None if r["first_window_frozen_fir_r2"] is None
+                  else round(r["first_window_frozen_fir_r2"],4))
+                  for r in records],flush=True)
     print("WROTE",root/"GATE_002_summary.json",flush=True)
 
 
