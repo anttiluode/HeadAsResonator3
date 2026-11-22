@@ -1,0 +1,24 @@
+name: Public EDF channel-type sidecar probe
+
+on:
+  push:
+    paths:
+      - 'scripts/nemar_channels_probe.py'
+      - '.github/workflows/nemar_channels_probe.yml'
+  workflow_dispatch:
+
+jobs:
+  metadata:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python scripts/nemar_channels_probe.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: public-channel-types
+          path: results/nemar_channels_probe.json
