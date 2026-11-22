@@ -1,0 +1,33 @@
+name: Real Gate 002 — speech monitor, lip EMG and independent windows
+
+on:
+  push:
+    paths:
+      - 'scripts/real_gate_002.py'
+      - 'resonator3/conditional.py'
+      - 'tests/test_conditional.py'
+      - '.github/workflows/real_gate_002.yml'
+  workflow_dispatch:
+
+jobs:
+  real-controls:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install CPU science tools
+        run: python -m pip install -e ".[eeg,dev]"
+      - name: Run mathematical false-attribution controls
+        run: python -m pytest -q
+      - name: Test three frozen 35s intervals of exact original recording
+        run: python -m scripts.real_gate_002
+      - name: Upload aggregate derived results, not raw EDFs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: real-gate-002-lip-emg-monitor-controls
+          path: results/real_gate_002/
+          if-no-files-found: warn
