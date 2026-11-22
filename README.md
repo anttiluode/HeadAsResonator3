@@ -17,6 +17,18 @@ This third project asks the next, stricter question: **Which temporal components
 
 Both recorded streams receive a shared **causal** bandpass. We avoid zero-phase forward-backward filtering because it can create acausal pre-ringing.
 
+## November 22 real-data results — the original voice signal is reproducible
+
+[**Real Result 001: exact-run replication, negative comparison, reference ablation**](REAL_RESULT_001.md) · [Original-run complex-phase results](https://github.com/anttiluode/HeadAsResonator3/actions/runs/45027375890) · [Reference-ablation results](https://github.com/anttiluode/HeadAsResonator3/actions/runs/45027519355).
+
+**Original experiment recording verified:** sub-03/ses-20240821/task-speechopen/acq-pangolin/run-02 in OpenNeuro ds007808. We used the **same 1200Hz EDF clock** for the BIDS-confirmed speaking-microphone monitor EEG131 and 16 predeclared genuine EEG channels. The strongest electrode (EEG121) had **0.9928 peak coherence**, **0.417 held-out R²** and **0.041 shifted-audio-null R²**. A different subject/run produced no positive held-out result.
+
+**Key control:** subtracting the 128-electrode common average reduced mean audio-prediction R² across the 16 predeclared channels from **0.3875** to **0.0247** (93.6% reduction), mean 50–500Hz coherence from **0.6724** to **0.0947**, and channels outperforming shifted-audio controls from **16/16** to **3/16**. The dominant response is therefore strongly **spatially common**, but the current passive records cannot uniquely identify whether that is cable, electrode, amplifier, head vibration, or widespread biological activity. **No physical origin or neural wiring has been identified.** The follow-up reference test was motivated by the initial observation and is exploratory.
+
+### Small remote recording slices—not giant downloads
+
+The public NEMAR ds007808 Zarr index has 1,974 stores **all at 250Hz**, insufficient to examine the reported 440.6Hz peak. We verified HTTP byte-range support for original **1200Hz EDF** data and fetched only a short ~12MB excerpt of the specific public run. BIDS channels.tsv confirms EEG131/132 are speaking-mic monitor channels; EEG129/130 are listening monitor channels; EEG135–138 lip EMG. This means there is **no need for a personal EEG rig or full 1.54TB dataset download** to reproduce these analyses. Run the two commands under REAL_RESULT_001.md.
+
 ## Run a complete demonstration now — no EEG download
 
 Python 3.10+, CPU only:
@@ -76,7 +88,7 @@ python scripts/bids_pairs.py --root "/data/ds007808" --run --limit 3 --duration 
 
 It matches subject, session, task, acquisition and run; mismatched filenames are excluded. Imagery task labels by themselves do **not** identify imagery-only samples: event timing must be parsed before making that comparison. The full ds007808 collection is roughly 1.54 TB; do not download it all for this pilot.
 
-**No public real EEG files are bundled and no human-data result is claimed here yet.** The original 0.954 coherence is a previously reported observation, not a replicated result of this new program.
+**No raw real EEG files are bundled or uploaded.** Real EEG/audio results are now reported in REAL_RESULT_001.md, with the original run independently reanalyzed using its BIDS-labelled speaking microphone monitor. The original 0.954 figure itself used a different input and estimator, so its precise peak-frequency correspondence remains unverified.
 
 ## Scientific restrictions
 
