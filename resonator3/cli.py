@@ -207,7 +207,7 @@ def main():
     parser.add_argument("--nperseg",type=int,default=4096)
     parser.add_argument("--pre-ms",type=float,default=20)
     parser.add_argument("--post-ms",type=float,default=120)
-    parser.add_argument("--step-ms",type=float,default=2)
+    parser.add_argument("--step-ms",type=float,default=1)
     parser.add_argument("--wrong-audio-shifts",type=int,default=3)
     parser.add_argument("--out",default="results/headasresonator3")
     a=parser.parse_args()
