@@ -17,6 +17,16 @@ This third project asks the next, stricter question: **Which temporal components
 
 Both recorded streams receive a shared **causal** bandpass. We avoid zero-phase forward-backward filtering because it can create acausal pre-ringing.
 
+## November 22 — Real Gate 002: EMG versus voice, across independent time windows
+
+[**Full real result and limitations**](REAL_RESULT_002.md) · [Successful 12-test workflow](https://github.com/anttiluode/HeadAsResonator3/actions/runs/45033613324) · [Download all three window audits and JSON](https://github.com/anttiluode/HeadAsResonator3/actions/runs/45033613324/artifacts/14758304528).
+
+Using the exact high-rate original ds007808 EDF, we compared **three nonoverlapping windows** (0–35, 120–155, 240–275 seconds). The official channel sidecar identifies **EEG131/132 as speaking-microphone monitors, EEG135–138 as lip EMG, EEG133–134 as EOG, and EEG129–130 as listening monitor channels**. Every EEG output was common-average referenced against **128 EEG channels only**.
+
+The three post-CAR survivor electrodes were **EEG065, EEG105, EEG113**; two passed the earlier shifted-audio threshold in both later time slices. **Mic and lip EMG together** improved EEG065 prediction in the first window (held-out R² 0.117 versus 0.050 microphone-only and 0.055 lip-only); the relative contribution varied across time and electrodes. Importantly, a **fixed microphone→CAR filter trained only in the first window** still predicted the later windows without refitting: for EEG065, R² **0.0443** and **0.0822**. Thus the residual audio-linked response is not confined to one fitted 35-second segment. It **cannot** uniquely be assigned to cable, electrode, skull, muscle, electronics or brain.
+
+The full numerical groups, independent shifted-audio controls, and warnings are in REAL_RESULT_002.md. This is a real, reproducible input-output finding using standard linear signal processing, **not** causal separation of the physical paths.
+
 ## November 22 real-data results — the original voice signal is reproducible
 
 [**Real Result 001: exact-run replication, negative comparison, reference ablation**](REAL_RESULT_001.md) · [Original-run complex-phase results](https://github.com/anttiluode/HeadAsResonator3/actions/runs/45027375890) · [Reference-ablation results](https://github.com/anttiluode/HeadAsResonator3/actions/runs/45027519355).
