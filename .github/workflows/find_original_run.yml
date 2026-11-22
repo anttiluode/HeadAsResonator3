@@ -1,0 +1,24 @@
+name: Match original HeadAsResonator recording ID
+
+on:
+  push:
+    paths:
+      - 'scripts/find_original_run.py'
+      - '.github/workflows/find_original_run.yml'
+  workflow_dispatch:
+
+jobs:
+  lookup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python scripts/find_original_run.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: original-HeadAsResonator-run-lookup
+          path: results/old_run_lookup.json
