@@ -33,5 +33,6 @@ def test_fixed_three_subject_inventory_includes_original_and_negative_without_si
 def test_invented_fourth_participant_refused_without_retargeting():
     stores=[sample(sub,1,"20230829" if sub==1 else "20240821")
             for sub in (1,2,3,4)]
+    stores.append(sample(3,2,"20240821"))
     with pytest.raises(RuntimeError,match="exactly three"):
         choose_repeated_runs({"stores":stores},3)
