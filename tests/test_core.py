@@ -33,7 +33,7 @@ def test_transfer_recovers_complex_phase_and_delayed_fir():
 def test_audio_specific_multichannel_lag_and_wrong_audio_null():
     x,Y,names,truth,fs=synthesize(seed=8,seconds=20)
     result=lag_audit(x,Y,fs,negative_ms=20,positive_ms=100,
-                     step_ms=2,max_taps=9,wrong_audio_shifts=3)
+                     step_ms=1,max_taps=9,wrong_audio_shifts=3)
     assert result["test_r2"].shape==(5,)
     assert result["wrong_audio_test_r2"].shape==(3,5)
     assert np.all(result["test_r2"][:4]>.75),result["test_r2"]
