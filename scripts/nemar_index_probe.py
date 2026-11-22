@@ -34,7 +34,24 @@ def main():
     args=a.parse_args()
     with urllib.request.urlopen(INDEX,timeout=50) as res:
         index=json.load(res)
+    from collections import Counter
+    rates=Counter()
+    by_task={}
+    highrate=[]
+    for store in index.get("stores",[]):
+        name=str(store.get("zarr",""))
+        for group in store.get("groups",[]):
+            rate=group.get("rate")
+            key=str(rate)
+            rates[key]+=1
+            task=next((p[5:] for p in name.split("_") if p.startswith("task-")),"unknown")
+            by_task.setdefault(task,Counter())[key]+=1
+            if isinstance(rate,(int,float)) and rate>=900 and len(highrate)<10:
+                highrate.append({"zarr":name,"group":group})
     report={
+        "available_stored_sample_rates":dict(rates),
+        "rates_by_task":{k:dict(v) for k,v in by_task.items()},
+        "sample_highrate_stores":highrate,
         "index_url":INDEX,
         "dataset_id":index.get("dataset_id"),
         "index_version":index.get("format_version"),
