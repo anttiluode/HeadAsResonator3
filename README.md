@@ -19,7 +19,7 @@ Both recorded streams receive a shared **causal** bandpass. We avoid zero-phase 
 
 ## November 22 — Real Gate 002: EMG versus voice, across independent time windows
 
-[**Full real result and limitations**](REAL_RESULT_002.md) · [Successful 12-test workflow](https://github.com/anttiluode/HeadAsResonator3/actions/runs/45033613324) · [Download all three window audits and JSON](https://github.com/anttiluode/HeadAsResonator3/actions/runs/45033613324/artifacts/14758304528).
+[**Full real result and limitations**](REAL_RESULT_002.md) · [Successful 12-test workflow](https://github.com/anttiluode/HeadAsResonator3/actions/runs/45033613324) · [Download all three window audits and JSON](https://github.com/anttiluode/HeadAsResonator3/actions/runs/45033613324/artifacts/14758304528) · [Persistent compact numerical summary](results/REAL_RESULT_002_summary.json).
 
 Using the exact high-rate original ds007808 EDF, we compared **three nonoverlapping windows** (0–35, 120–155, 240–275 seconds). The official channel sidecar identifies **EEG131/132 as speaking-microphone monitors, EEG135–138 as lip EMG, EEG133–134 as EOG, and EEG129–130 as listening monitor channels**. Every EEG output was common-average referenced against **128 EEG channels only**.
 
@@ -72,7 +72,7 @@ python -m resonator3.cli --edf "recording_eeg.edf" --wav "matching_audio.wav" --
 
 The default 50–500 Hz acoustic band requires more than 1000 Hz sampling. It is appropriate for the reported 1200 Hz g.Pangolin recording and **not** for ordinary 160 Hz resting EEG.
 
-Use --channels to select comma-separated EDF channel names, or --max-channels to limit memory. A verified known EDF/WAV clock offset may be supplied using --audio-offset-ms; no synchronization offset is silently estimated. If synchronization is unknown, absolute physical delays are also unknown.
+With an accompanying BIDS channels.tsv file, automatic selection uses the declared EEG/ECOG/SEEG types and excludes audio monitors, EOG and EMG. Without the sidecar, a Pangolin-style EEG001–EEG139 file is deliberately refused as ambiguous: supply --channels explicitly and verify channel identities. Use --max-channels to limit memory. A verified known EDF/WAV clock offset may be supplied using --audio-offset-ms; no synchronization offset is silently estimated. If synchronization is unknown, absolute physical delays are also unknown.
 
 Output: overview.png (complex phase, amplitude, coherence, signed impulse, scores and spatial lag map); transfer_complex.npz (the actual complex H, coefficients, input-power support); channel_audit.csv (one channel per row); summary.json (all numerical results and limitations).
 
