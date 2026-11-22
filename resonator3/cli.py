@@ -18,6 +18,40 @@ from scipy import signal
 from .core import complex_transfer, lag_audit, synthesize
 
 
+def _select_auto_channels(edf, raw, max_channels):
+    """Avoid mistaking EDF microphone/EMG monitors for EEG electrodes.
+
+    BIDS channel type from the actual companion channels.tsv is authoritative.
+    Without it, refuse ambiguous Pangolin-style 128 EEG + generic EEG###
+    auxiliary labels, rather than silently treating the microphone as brain.
+    """
+    p=Path(edf)
+    sidecar=(p.with_name(p.name[:-8]+"_channels.tsv")
+             if p.name.endswith("_eeg.edf") else None)
+    if sidecar is not None and sidecar.is_file():
+        with sidecar.open("r",encoding="utf-8-sig",newline="") as handle:
+            rows=list(csv.DictReader(handle,delimiter="\t"))
+        by_type={r.get("name"):r.get("type","").upper() for r in rows}
+        choices=[name for name in raw.ch_names
+                 if by_type.get(name) in ("EEG","ECOG","SEEG")]
+        if not choices:
+            raise ValueError("No BIDS EEG/ECOG/SEEG channel labels in "+str(sidecar))
+        return choices[:max_channels]
+    # Fallback MNE typing is safe only when labels are not ambiguous.
+    if "EEG128" in raw.ch_names and any(
+        f"EEG{i:03d}" in raw.ch_names for i in (129,130,131,132,135,139)):
+        raise ValueError(
+            "EDF has generic EEG129+ labels that could be microphone, EMG or EOG. "
+            "Supply the companion BIDS channels.tsv or explicit --channels; "
+            "automatic classification is not safe.")
+    declared=raw.get_channel_types()
+    bad_words=("EOG","EMG","ECG","EKG","MIC","AUDIO","TRIG","AUX")
+    choices=[name for name,typ in zip(raw.ch_names,declared)
+             if typ.lower() in ("eeg","ecog","seeg") and
+             not any(word in name.upper() for word in bad_words)]
+    return choices[:max_channels]
+
+
 def _read_pair(edf, wav, duration, channels, max_channels, audio_offset_ms):
     try:
         import mne
@@ -36,13 +70,7 @@ def _read_pair(edf, wav, duration, channels, max_channels, audio_offset_ms):
         if unknown:
             raise ValueError("EDF does not contain: "+str(unknown)+"\nAvailable: "+str(raw.ch_names[:30]))
     else:
-        # The Pangolin EEG channels in ds007808 are named EEG001..EEG128;
-        # exclude EOG/EMG, stimulus, and audio monitor by default.
-        names=[name for name in raw.ch_names
-               if name.upper().startswith("EEG") or
-               (name in raw.ch_names and raw.get_channel_types(
-                   picks=[name])[0] == "eeg")]
-        names=names[:max_channels]
+        names=_select_auto_channels(edf,raw,max_channels)
     if not names:
         raise ValueError("No EEG channels identified. Pass --channels explicitly")
     n=int(fs*duration) if duration>0 else raw.n_times
