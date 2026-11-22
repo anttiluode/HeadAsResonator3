@@ -1,0 +1,33 @@
+name: Gate 003B - Three public subjects, repeated high-rate runs
+
+on:
+  push:
+    paths:
+      - 'scripts/choose_run_replicates.py'
+      - 'scripts/real_gate_003b.py'
+      - 'scripts/real_gate_003.py'
+      - 'tests/test_run_replicates.py'
+      - '.github/workflows/real_gate_003b.yml'
+  workflow_dispatch:
+
+jobs:
+  limited-repeated-runs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install -e ".[eeg,dev]"
+      - name: Run all numerical and selection controls
+        run: python -m pytest -q
+      - name: Gate 003B - unchanged scoring across metadata-selected runs
+        run: python -m scripts.real_gate_003b
+      - name: Upload all results, errors and plot; no raw EDF
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Gate003B-three-subject-multiple-runs
+          path: results/real_gate_003b/
+          if-no-files-found: warn
