@@ -195,9 +195,10 @@ def plot(rows,output):
     plt.close(fig)
 
 
-def run(n_fresh=8,out="results/real_gate_003"):
+def run(n_fresh=8,out="results/real_gate_003",selection=None,gate_label="003"):
     output=Path(out);output.mkdir(parents=True,exist_ok=True)
-    selected=choose_runs(read_index(),n_fresh=n_fresh)
+    selected=(choose_runs(read_index(),n_fresh=n_fresh)
+              if selection is None else selection)
     (output/"frozen_metadata_selection.json").write_text(
         json.dumps(selected,indent=2)+"\n",encoding="utf-8")
     rows=[]
@@ -221,7 +222,7 @@ def run(n_fresh=8,out="results/real_gate_003"):
             encoding="utf-8")
     summary=summarize(selected,rows)
     report={
-        "experiment":"HeadAsResonator3 real Gate 003 cross-participant generalization",
+        "experiment":f"HeadAsResonator3 real Gate {gate_label} generalization",
         "dataset":"OpenNeuro ds007808/NEMAR on007808 v1.0.0",
         "selection":selected,
         "config":{"n_channels":16,"sample_rate_hz":1200,"seconds_per_run":35,
@@ -245,11 +246,11 @@ def run(n_fresh=8,out="results/real_gate_003"):
             "No external intervention or independently verified physical vibration path."
         ]
     }
-    (output/"GATE_003_summary.json").write_text(
+    (output/f"GATE_{gate_label}_summary.json").write_text(
         json.dumps(report,indent=2)+"\n",encoding="utf-8")
     plot(rows,output)
     print("SUMMARY",json.dumps(summary,sort_keys=True),flush=True)
-    print("WROTE",output/"GATE_003_summary.json",flush=True)
+    print("WROTE",output/f"GATE_{gate_label}_summary.json",flush=True)
     return report
 
 
