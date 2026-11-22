@@ -19,10 +19,16 @@ from urllib.request import Request,urlopen
 import numpy as np
 from resonator3.cli import analyze
 
-BASE="https://data.nemar.org/on007808/v1.0.0/sub-01/ses-20230829/eeg/"
-STEM="sub-01_ses-20230829_task-speechopen_acq-pangolin_run-01"
-EDF_URL=BASE+STEM+"_eeg.edf"
-SIDE_URL=BASE+STEM+"_channels.tsv"
+ROOT="https://data.nemar.org/on007808/v1.0.0/"
+RUNS={
+    "early":"sub-01/ses-20230829/eeg/sub-01_ses-20230829_task-speechopen_acq-pangolin_run-01",
+    "original":"sub-03/ses-20240821/eeg/sub-03_ses-20240821_task-speechopen_acq-pangolin_run-02",
+}
+
+
+def urls(which):
+    key=RUNS[which]
+    return ROOT+key+"_eeg.edf",ROOT+key+"_channels.tsv"
 
 
 def read_range(url, start, stop, max_bytes=20_000_000):
@@ -42,15 +48,15 @@ def read_range(url, start, stop, max_bytes=20_000_000):
     return data
 
 
-def fetch_excerpt(path, *, start_seconds=60,duration_seconds=40):
-    head256=read_range(EDF_URL,0,255,max_bytes=512)
+def fetch_excerpt(path, edf_url, *, start_seconds=60,duration_seconds=40):
+    head256=read_range(edf_url,0,255,max_bytes=512)
     if head256[:8].strip()!=b"0":
         raise RuntimeError("Not recognizable EDF header")
     nsig=int(head256[252:256].strip())
     hd=int(head256[184:192].strip())
     if not (1<=nsig<=1000 and hd==256+256*nsig):
         raise RuntimeError("Invalid EDF per-signal header size")
-    header=read_range(EDF_URL,0,hd-1,max_bytes=512_000)
+    header=read_range(edf_url,0,hd-1,max_bytes=512_000)
     labels=[header[256+16*i:256+16*(i+1)].decode("ascii","replace").strip()
             for i in range(nsig)]
     samples=[int(header[256+216*nsig+8*i:256+216*nsig+8*(i+1)].strip())
@@ -66,12 +72,12 @@ def fetch_excerpt(path, *, start_seconds=60,duration_seconds=40):
         raise ValueError("Selected excerpt outside original EDF or too short")
     start_byte=hd+start_record*rec_bytes
     stop_byte=start_byte+n_records*rec_bytes-1
-    raw=read_range(EDF_URL,start_byte,stop_byte,max_bytes=20_000_000)
+    raw=read_range(edf_url,start_byte,stop_byte,max_bytes=20_000_000)
     newhead=bytearray(header)
     newhead[236:244]=str(n_records).ljust(8).encode("ascii")
     Path(path).write_bytes(newhead+raw)
     return {
-      "source_url":EDF_URL,"header_bytes":hd,
+      "source_url":edf_url,"header_bytes":hd,
       "original_records":n_total,"record_duration_seconds":rec_time,
       "excerpt_start_original_seconds":start_record*rec_time,
       "excerpt_duration_seconds":n_records*rec_time,
@@ -81,8 +87,8 @@ def fetch_excerpt(path, *, start_seconds=60,duration_seconds=40):
     }
 
 
-def channels_from_sidecar():
-    with urlopen(SIDE_URL,timeout=45) as response:
+def channels_from_sidecar(side_url):
+    with urlopen(side_url,timeout=45) as response:
         rows=list(csv.DictReader(io.StringIO(response.read(200000).decode("utf-8-sig")),
                                   delimiter="\t"))
     by_name={r["name"]:r for r in rows}
@@ -96,19 +102,21 @@ def channels_from_sidecar():
 
 def main():
     p=argparse.ArgumentParser()
-    p.add_argument("--start",type=int,default=60)
+    p.add_argument("--which",choices=sorted(RUNS),default="original")
+    p.add_argument("--start",type=int,default=0)
     p.add_argument("--duration",type=int,default=40)
     p.add_argument("--out",default="results/real_nemar_001")
     a=p.parse_args()
     from mne.io import read_raw_edf
-    sidecar=channels_from_sidecar()
+    edf_url,side_url=urls(a.which)
+    sidecar=channels_from_sidecar(side_url)
     names=[f"EEG{index:03d}" for index in range(1,129,8)] # 16 predeclared spaced labels
     assert len(names)==16
     if any(sidecar.get(name,{}).get("type")!="EEG" for name in names):
         raise RuntimeError("One of the output channels isn't declared EEG")
     with tempfile.TemporaryDirectory() as t:
         path=Path(t)/"public_excerpt.edf"
-        info=fetch_excerpt(path,start_seconds=a.start,duration_seconds=a.duration)
+        info=fetch_excerpt(path,edf_url,start_seconds=a.start,duration_seconds=a.duration)
         raw=read_raw_edf(path,preload=False,verbose="ERROR")
         fs=float(raw.info["sfreq"])
         if fs<1000:
@@ -126,8 +134,9 @@ def main():
                         wrong_audio_shifts=3,
                         dataset_meta={
                           "dataset":"NEMAR on007808 v1.0.0 / OpenNeuro ds007808",
-                          "edf_source":EDF_URL,
-                          "sidecar":SIDE_URL,
+                          "source_run":a.which,
+                          "edf_source":edf_url,
+                          "sidecar":side_url,
                           "audio_input":"EEG131, speaking microphone monitor channel 1 (inside same EDF)",
                           "timebase":"same EDF sample clock, hardware transfer delays unknown",
                           "original_interval_start_seconds":a.start,
