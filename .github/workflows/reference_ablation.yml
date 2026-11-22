@@ -1,0 +1,26 @@
+name: Real sub-03 common-reference ablation
+
+on:
+  push:
+    paths:
+      - 'scripts/reference_ablation.py'
+      - '.github/workflows/reference_ablation.yml'
+  workflow_dispatch:
+
+jobs:
+  same-clock-reference:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install -e ".[eeg,dev]"
+      - name: Compare fixed 128-channel average reference vs original EEG
+        run: python -m scripts.reference_ablation
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: original-sub03-reference-ablation
+          path: results/reference_ablation/
