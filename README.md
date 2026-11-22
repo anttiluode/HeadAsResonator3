@@ -17,6 +17,16 @@ This third project asks the next, stricter question: **Which temporal components
 
 Both recorded streams receive a shared **causal** bandpass. We avoid zero-phase forward-backward filtering because it can create acausal pre-ringing.
 
+## November 22 — Real Gate 003B: another person, and recording-to-recording variability
+
+[**Gate 003B detailed research report**](REAL_RESULT_003B.md) · [successful 23-test workflow](https://github.com/anttiluode/HeadAsResonator3/actions/runs/45036987578) · [cross-run figure and full JSON receipts](https://github.com/anttiluode/HeadAsResonator3/actions/runs/45036987578/artifacts/14759684516) · [numerical summary](results/REAL_RESULT_003B_summary.json).
+
+The planned **eight-new-person Gate 003 did not pass eligibility**: NEMAR's high-rate Pangolin overt-speech index contains only **three** subjects, two of whom were already tested. That failure remains in [the original protocol](REAL_GATE_003_PROTOCOL.md). We declared a separate [three-person repeated-run protocol](REAL_GATE_003B_PROTOCOL.md) and analyzed **9 independent recordings (3 per subject), with 23 tests passing**, without changing the source channels, causal filter, time lag search, wrong-audio controls or descriptive thresholds.
+
+**Five of nine recordings** from **two of the three people** showed strong audio-to-electrode signal: all three recordings of the genuinely new **sub-02**, and two recordings of the previously examined **sub-03**. All three **sub-01** recordings were weak. Common-average referencing reduced mean held-out microphone→EEG R² by **88–96%** in every strongly linked run (mean 93.2%). The last sub-03 session was weaker than its original session, even though its microphone signal was not weaker. Microphone levels and peak coherence frequencies varied substantially, so neither an invariant 440 Hz skull resonance nor a unique physical pathway is established.
+
+**Status:** a reproduced, mostly shared audio-related sensor component across two public participants, with counterexamples; **not** general population prevalence, a brain/wire/skull source classification, a causal finding, or speech decoding without microphone input.
+
 ## November 22 — Real Gate 002: EMG versus voice, across independent time windows
 
 [**Full real result and limitations**](REAL_RESULT_002.md) · [Successful 12-test workflow](https://github.com/anttiluode/HeadAsResonator3/actions/runs/45033613324) · [Download all three window audits and JSON](https://github.com/anttiluode/HeadAsResonator3/actions/runs/45033613324/artifacts/14758304528) · [Persistent compact numerical summary](results/REAL_RESULT_002_summary.json).
