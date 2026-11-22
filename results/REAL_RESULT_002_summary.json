@@ -1,0 +1,208 @@
+{
+  "experiment": "HeadAsResonator3 Real Gate 002 — auxiliary channels and frozen cross-window audio response",
+  "date": "2026-11-22",
+  "status": "completed verified real public recording; 12/12 Python tests pass",
+  "run": "https://github.com/anttiluode/HeadAsResonator3/actions/runs/45033613324",
+  "full_results": "https://github.com/anttiluode/HeadAsResonator3/actions/runs/45033613324/artifacts/14758304528",
+  "recording": {
+    "dataset": "OpenNeuro ds007808 / NEMAR on007808",
+    "id": "sub-03/ses-20240821/task-speechopen/acq-pangolin/run-02",
+    "sampling_hz": 1200,
+    "windows_seconds": [
+      [
+        0,
+        35
+      ],
+      [
+        120,
+        155
+      ],
+      [
+        240,
+        275
+      ]
+    ],
+    "targets": "EEG001 through EEG121 step 8, CAR reference = mean of EEG001–EEG128",
+    "source_channels": {
+      "primary_microphone": "EEG131",
+      "second_microphone": "EEG132",
+      "lip_upper_bipolar": [
+        "EEG135",
+        "EEG136"
+      ],
+      "lip_lower_bipolar": [
+        "EEG137",
+        "EEG138"
+      ],
+      "ocular_bipolar": [
+        "EEG133",
+        "EEG134"
+      ],
+      "listening_monitors": [
+        "EEG129",
+        "EEG130"
+      ]
+    }
+  },
+  "car_summary": [
+    {
+      "window_start_s": 0,
+      "positive_channels": [
+        "EEG065",
+        "EEG105",
+        "EEG113"
+      ],
+      "mean_audio_r2": 0.024717474742863073,
+      "mean_band_coherence": 0.09469424697069051
+    },
+    {
+      "window_start_s": 120,
+      "positive_channels": [
+        "EEG065",
+        "EEG105"
+      ],
+      "mean_audio_r2": 0.01036613762196864,
+      "mean_band_coherence": 0.13232827858571045
+    },
+    {
+      "window_start_s": 240,
+      "positive_channels": [
+        "EEG065",
+        "EEG105"
+      ],
+      "mean_audio_r2": 0.009712299047471333,
+      "mean_band_coherence": 0.17568003531589355
+    }
+  ],
+  "survivor_heldout_r2": {
+    "EEG065": {
+      "refit_windows": [
+        0.21848487484801227,
+        0.055124142526619235,
+        0.05803908932430357
+      ],
+      "frozen_fit_from_first_window_train_to_future": [
+        null,
+        0.04425286810105644,
+        0.0821781329473632
+      ],
+      "fixedlag_mic_only": [
+        0.04951,
+        0.00679,
+        0.0038
+      ],
+      "fixedlag_lip_emg_only": [
+        0.05493699717627898,
+        0.006662148968741288,
+        0.03367888258892038
+      ],
+      "fixedlag_both": [
+        0.11704,
+        0.01266,
+        0.03221
+      ]
+    },
+    "EEG105": {
+      "refit_windows": [
+        0.0527298498545421,
+        0.0427565753280047,
+        0.03326762435198749
+      ],
+      "frozen_fit_from_first_window_train_to_future": [
+        null,
+        0.028880247794204283,
+        0.036890888121531185
+      ],
+      "fixedlag_mic_only": [
+        0.03895,
+        0.02707,
+        0.03185
+      ],
+      "fixedlag_lip_emg_only": [
+        0.03383346555432709,
+        0.006771733391534918,
+        0.035071793277362984
+      ],
+      "fixedlag_both": [
+        0.0505,
+        0.0288,
+        0.04554
+      ]
+    },
+    "EEG113": {
+      "refit_windows": [
+        0.031251941863773225,
+        0.01725030345091272,
+        0.01779397947481076
+      ],
+      "frozen_fit_from_first_window_train_to_future": [
+        null,
+        0.011847662763855515,
+        0.01442200726877374
+      ],
+      "fixedlag_mic_only": [
+        0.02765,
+        0.01181,
+        0.01756
+      ],
+      "fixedlag_lip_emg_only": [
+        0.013357782305110755,
+        0.0008082482333713337,
+        0.011297767909045686
+      ],
+      "fixedlag_both": [
+        0.02911,
+        0.01177,
+        0.01792
+      ]
+    }
+  },
+  "other_fixedlag_mean_r2_by_window": {
+    "mic1": [
+      0.012792865424492823,
+      0.005742088653267752,
+      0.0068524395618166575
+    ],
+    "mic2": [
+      0.011661917905712305,
+      0.004054349402630789,
+      0.0058697003920130456
+    ],
+    "lip_emg": [
+      0.00619079735539127,
+      -0.00013571219705753312,
+      0.008614557704069874
+    ],
+    "mic_plus_lip": [
+      0.015195363040179481,
+      0.00423504137103721,
+      0.010547545012988838
+    ],
+    "shifted_mic": [
+      -0.0006243096876031029,
+      0.00034966022483848974,
+      0.0004845489178851789
+    ],
+    "eog": [
+      -0.04779250871257723,
+      0.022215343524511627,
+      0.026421773687759713
+    ],
+    "listening_monitors": [
+      0.004631478970953486,
+      0.009571705721948542,
+      0.009256666944573097
+    ]
+  },
+  "numerical_note": "Refit and frozen R2 values are exact from derived JSON; some fixedlag source-group values for survivors are rounded to 5 decimal places. Download full artifact for unrounded per-channel metrics.",
+  "interpretation": "Evidence for a weak but time-transferable audio-related CAR residual with occasional lip EMG complement; passive data cannot identify physical route, and conditional R2 is not causal mediation.",
+  "limits": [
+    "Only one selected participant/run; 0-35s was already investigated and used for survivor selection.",
+    "The later time slices are independent windows, not independent participants or randomized interventions.",
+    "CAR may remove genuine distributed signals.",
+    "Audio and lip EMG share vocal causes.",
+    "Listening audio-monitor channels were not silent; cannot be treated as inactive negative controls.",
+    "Frozen first-window model tested on unseen later segments but not other participants.",
+    "No claim of skull-vs-cable-vs-neural separation or medical diagnosis."
+  ]
+}
