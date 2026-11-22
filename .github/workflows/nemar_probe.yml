@@ -1,0 +1,25 @@
+name: NEMAR Zarr metadata probe (no signal downloads)
+
+on:
+  push:
+    paths:
+      - 'scripts/nemar_index_probe.py'
+      - '.github/workflows/nemar_probe.yml'
+  workflow_dispatch:
+
+jobs:
+  index:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Inspect public dataset index
+        run: python scripts/nemar_index_probe.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: nemar-public-store-index
+          path: results/nemar_index_probe.json
