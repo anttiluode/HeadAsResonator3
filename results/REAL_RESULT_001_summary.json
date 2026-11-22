@@ -1,0 +1,64 @@
+{
+  "experiment": "HeadAsResonator3 real public speech EEG run and CAR ablation",
+  "date": "2026-11-22",
+  "dataset": "OpenNeuro ds007808 / NEMAR on007808 v1.0.0",
+  "source": "sub-03_ses-20240821_task-speechopen_acq-pangolin_run-02",
+  "sampling_hz": 1200,
+  "duration_seconds": 35,
+  "input": "EEG131: BIDS speaking microphone monitor channel 1, same EDF clock",
+  "outputs": "EEG001, EEG009, EEG017, EEG025, EEG033, EEG041, EEG049, EEG057, EEG065, EEG073, EEG081, EEG089, EEG097, EEG105, EEG113, EEG121",
+  "source_file": "https://data.nemar.org/on007808/v1.0.0/sub-03/ses-20240821/eeg/sub-03_ses-20240821_task-speechopen_acq-pangolin_run-02_eeg.edf",
+  "method": "complex H1 via Welch and sparse FIR lag search with three shifted-audio refits; 50–500Hz shared causal bandpass",
+  "original_run": {
+    "workflow": "https://github.com/anttiluode/HeadAsResonator3/actions/runs/45027375890",
+    "artifact": "https://github.com/anttiluode/HeadAsResonator3/actions/runs/45027375890/artifacts/14756322094",
+    "strongest_channel": "EEG121",
+    "peak_coherence": 0.9927559474435065,
+    "mean_coherence": 0.7686608016969901,
+    "heldout_r2": 0.4173622902749883,
+    "best_wrong_audio_r2": 0.04114782112552706,
+    "dominant_lag_ms": 0,
+    "negative_lag_energy_fraction": 0.12856644428784017,
+    "peak_frequency_hz": null,
+    "comment": "Peak frequency not computed from spectral arrays in published summary; original 440.6Hz was from earlier different estimator and reference."
+  },
+  "common_average": {
+    "workflow": "https://github.com/anttiluode/HeadAsResonator3/actions/runs/45027519355",
+    "artifact": "https://github.com/anttiluode/HeadAsResonator3/actions/runs/45027519355/artifacts/14756825002",
+    "reference": "mean of 128 EEG type channels, microphone excluded",
+    "raw": {
+      "mean_heldout_r2": 0.38752636141096175,
+      "median_heldout_r2": 0.3940716935643847,
+      "max_heldout_r2": 0.4173622902749885,
+      "mean_band_coherence": 0.6723857926695439,
+      "mean_peak_coherence": 0.9819823132908236,
+      "channels_above_wrong_audio": 16
+    },
+    "car": {
+      "mean_heldout_r2": 0.024717474742863052,
+      "median_heldout_r2": 0.010773572433105172,
+      "max_heldout_r2": 0.21848487484801238,
+      "mean_band_coherence": 0.09469424697069051,
+      "mean_peak_coherence": 0.49793331319811407,
+      "channels_above_wrong_audio": 3
+    }
+  },
+  "different_run_negative": {
+    "workflow": "https://github.com/anttiluode/HeadAsResonator3/actions/runs/45027195951",
+    "source": "sub-01_ses-20230829_task-speechopen_acq-pangolin_run-01",
+    "excerpt_seconds": [
+      60,
+      100
+    ],
+    "max_heldout_r2": -0.0009497408199081736
+  },
+  "interpretation": "Strong speech-related signal in exact original human recording, mainly spatially shared under CAR; physical path (skull vs cable vs electronics vs biological) remains not identified.",
+  "limits": [
+    "Single original participant/run (35s) and 16 fixed electrodes",
+    "CAR can suppress genuine widespread physiology as well as nuisance pickup",
+    "No physical sensor interventions; skull vs cable cannot be uniquely determined",
+    "Frequency of maximum coherence in new analysis not yet tabulated",
+    "Wrong-audio controls are descriptive, not corrected inferential p values",
+    "Original 0.954 at 440.6 Hz not precisely reverified from same external WAV"
+  ]
+}
