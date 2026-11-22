@@ -1,8 +1,8 @@
 # Real Gate 002 — Post-reference speech residual, lip EMG, and independent time windows
 
-**Date:** 22 November 2026. **Status:** completed real public-data experiment. All **12/12 automated tests** passed and all three 35-second public EEG windows were analyzed. This is observational electrical/acoustic measurement, *not* anatomical source separation or new biological physics.
+**Date:** 22 November 2026. **Status:** completed real public-data experiment. All **15/15 automated tests** passed and all three 35-second public EEG windows were analyzed. This is observational electrical/acoustic measurement, *not* anatomical source separation or new biological physics.
 
-[Successful complete workflow](https://github.com/anttiluode/HeadAsResonator3/actions/runs/45033613324) · [Full derived per-channel results and three plots](https://github.com/anttiluode/HeadAsResonator3/actions/runs/45033613324/artifacts/14758304528) · [Reproducible code](scripts/real_gate_002.py) · [Fixed-lag model](resonator3/conditional.py).
+[Successful complete workflow](https://github.com/anttiluode/HeadAsResonator3/actions/runs/45033613324) · [Full derived per-channel results and three plots](https://github.com/anttiluode/HeadAsResonator3/actions/runs/45033613324/artifacts/14758304528) · [Compact persistent JSON](results/REAL_RESULT_002_summary.json) · [Reproducible code](scripts/real_gate_002.py) · [Fixed-lag model](resonator3/conditional.py).
 
 ## Dataset and prespecified inputs
 
